@@ -1,85 +1,66 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { supabase } from '@/lib/supabase' // パスが違う場合は修正してください
+import { createClient } from '@supabase/supabase-js' // 💡 直接ライブラリから呼ぶ
+
+// 💡 ここに、今Supabaseの管理画面（Settings > API）で見ている
+// 「本物のURL」と「本物のanonキー」をそのまま【生文字】で貼り付けてください。
+const url = 'https://xxxx.supabase.co' 
+const anonKey = 'eyJhbGci...' 
+
+// 💡 完全に独立した、今だけの接続テスト用クライアントを強制作成
+const directSupabase = createClient(url, anonKey)
 
 export default function TestPage() {
   const [inputName, setInputName] = useState('')
   const [contacts, setContacts] = useState<any[]>([])
-  const [status, setStatus] = useState('接続チェック待ち')
+  const [status, setStatus] = useState('直接接続チェック中...')
 
-  // 1. データベースからデータを読み込む（SELECT）
   const fetchData = async () => {
-    const { data, error } = await supabase
+    const { data, error } = await directSupabase // 💡 テスト用クライアントを使用
       .from('contacts')
       .select('*')
-      .order('created_at', { ascending: false }) // 新しい順に並べる
+      .order('created_at', { ascending: false })
     
     if (error) {
-      setStatus(`読み込み失敗❌: ${error.message}`)
+      setStatus(`[SELECT失敗] 理由: ${error.message} (コード: ${error.code || 'なし'})`)
     } else {
       setContacts(data || [])
-      setStatus('DB接続・読み込み成功完了！✅')
+      setStatus('生のURLとKEYで通信成功！✅')
     }
   }
 
-  // 画面が開いたときに自動で読み込む
-  useEffect(() => {
-    fetchData()
-  }, [])
+  useEffect(() => { fetchData() }, [])
 
-  // 2. データベースにデータを書き込む（INSERT）
   const handleInsert = async () => {
     if (!inputName) return
-    setStatus('送信中...')
+    setStatus('直接送信中...')
 
-    // contactsテーブルの「name」列に文字を入れ、emailとmessageは一旦テスト用にダミーを入れます
-    const { error } = await supabase
+    const { error } = await directSupabase // 💡 テスト用クライアントを使用
       .from('contacts')
-      .insert([
-        { 
-          name: inputName, 
-          email: 'test@example.com', 
-          message: 'ローカル・本番の接続テストです' 
-        }
-      ])
+      .insert([{ name: inputName, email: 'test@example.com', message: '直接注入テスト' }])
 
     if (error) {
-      setStatus(`書き込み失敗❌: ${error.message}`)
+      setStatus(`[INSERT失敗] 理由: ${error.message} (コード: ${error.code || 'なし'})`)
     } else {
-      setStatus('書き込み成功！データを再取得します...')
+      setStatus('書き込み完全成功！🎉')
       setInputName('')
-      fetchData() // 成功したら再取得して画面を更新
+      fetchData()
     }
   }
 
   return (
-    <div style={{ padding: '20px', fontFamily: 'sans-serif' }}>
-      <h1>🔌 Supabase 接続テスト (contacts)</h1>
-      <p><strong>ステータス:</strong> {status}</p>
-
-      {/* 入力フォーム */}
-      <div style={{ marginBottom: '20px' }}>
-        <input
-          type="text"
-          value={inputName}
-          onChange={(e) => setInputName(e.target.value)}
-          placeholder="名前を入力してください"
-          style={{ padding: '8px', marginRight: '8px' }}
-        />
-        <button onClick={handleInsert} style={{ padding: '8px 16px' }}>
-          DBにインサートする
-        </button>
+    <div style={{ padding: '20px' }}>
+      <h1>🔬 ガチンコ切り分けテスト画面</h1>
+      <p><strong>現在のステータス:</strong> <span style={{ color: 'blue', fontWeight: 'bold' }}>{status}</span></p>
+      <div>
+        <input type="text" value={inputName} onChange={(e) => setInputName(e.target.value)} />
+        <button onClick={handleInsert}>DBに書き込む</button>
       </div>
-
-      {/* データ一覧表示 */}
-      <h3>📥 DBから取得した連絡先一覧</h3>
-      <ul style={{ lineHeight: '1.8' }}>
+      <h3>一覧</h3>
+      <ul>
         {contacts.map((item) => (
-          <li key={item.id}>
-            <strong>{item.name}</strong> ({item.email}) - {item.message} 
-            <small style={{ color: '#888', marginLeft: '10px' }}>[{item.created_at}]</small>
-          </li>
+          <li key={item.id}>{item.name}</li>
         ))}
       </ul>
     </div>
