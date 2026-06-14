@@ -1,68 +1,89 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import { createClient } from '@supabase/supabase-js' // 💡 直接ライブラリから呼ぶ
+import { useState } from 'react';
+import { createClient } from '@supabase/supabase-js';
 
-// 💡 ここに、今Supabaseの管理画面（Settings > API）で見ている
-// 「本物のURL」と「本物のanonキー」をそのまま【生文字】で貼り付けてください。
-const url = 'https://fxpmzgspwyleaycqnrdm.supabase.co' 
-const anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ4cG16Z3Nwd3lsZWF5Y3FucmRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEzMjkwNjQsImV4cCI6MjA5NjkwNTA2NH0.A4Q2Krj1YzBK59GMS-0s5WHVe4gOiMTEs_pLX-ALwfM' 
+// 1. 環境変数から安全に取得（末尾のスラッシュや前後の空白を自動で削る安全ガード付き）
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim().replace(/\/$/, '') || '';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim() || '';
 
-// 💡 完全に独立した、今だけの接続テスト用クライアントを強制作成
-const directSupabase = createClient(url, anonKey)
+// 2. Supabaseクライアントの初期化
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export default function TestPage() {
-  const [inputName, setInputName] = useState('')
-  const [contacts, setContacts] = useState<any[]>([])
-  const [status, setStatus] = useState('直接接続チェック中...')
+  const [status, setStatus] = useState<string>('待機中...');
+  const [name, setName] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
 
-  const fetchData = async () => {
-    const { data, error } = await directSupabase // 💡 テスト用クライアントを使用
-      .from('contacts')
-      .select('*')
-      .order('created_at', { ascending: false })
-    
-    if (error) {
-      setStatus(`[SELECT失敗] 理由: ${error.message} (コード: ${error.code || 'なし'})`)
-    } else {
-      setContacts(data || [])
-      setStatus('生のURLとKEYで通信成功！✅')
-    }
-  }
-
-  useEffect(() => { fetchData() }, [])
-
+  // 📝 データの書き込み（INSERT）テスト
   const handleInsert = async () => {
-    if (!inputName) return
-    setStatus('直接送信中...')
-
-    const { error } = await directSupabase // 💡 テスト用クライアントを使用
-      .from('contacts')
-      .insert([{ name: inputName, email: 'test@example.com', message: '直接注入テスト' }])
-
-    if (error) {
-      setStatus(`[INSERT失敗] 理由: ${error.message} (コード: ${error.code || 'なし'})`)
-    } else {
-      setStatus('書き込み完全成功！🎉')
-      setInputName('')
-      fetchData()
+    if (!name) {
+      alert('名前を入力してください');
+      return;
     }
-  }
+    setLoading(true);
+    setStatus('書き込み中...');
+
+    try {
+      const { error } = await supabase
+        .from('contacts')
+        .insert([{ name: name }]);
+
+      if (error) {
+        setStatus(`[書き込み失敗] 理由: ${error.message} (コード: ${error.code})`);
+      } else {
+        setStatus('書き込み成功！🎉（DBを確認してください）');
+        setName(''); // 入力欄をクリア
+      }
+    } catch (err: any) {
+      setStatus(`[通信エラー] 理由: ${err.message || err}`);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div style={{ padding: '20px' }}>
-      <h1>🔬 ガチンコ切り分けテスト画面</h1>
-      <p><strong>現在のステータス:</strong> <span style={{ color: 'blue', fontWeight: 'bold' }}>{status}</span></p>
-      <div>
-        <input type="text" value={inputName} onChange={(e) => setInputName(e.target.value)} />
-        <button onClick={handleInsert}>DBに書き込む</button>
+    <div style={{ padding: '40px', maxWidth: '500px', margin: '0 auto', fontFamily: 'sans-serif' }}>
+      <h2>🔌 Supabase 安全接続テスト</h2>
+      
+      <div style={{ 
+        padding: '15px', 
+        backgroundColor: status.includes('成功') ? '#e6fffa' : status.includes('失敗') || status.includes('エラー') ? '#fff5f5' : '#f7fafc',
+        border: '1px solid',
+        borderColor: status.includes('成功') ? '#319795' : status.includes('失敗') || status.includes('エラー') ? '#e53e3e' : '#cbd5e0',
+        borderRadius: '5px',
+        marginBottom: '20px',
+        fontWeight: 'bold'
+      }}>
+        現在のステータス: {status}
       </div>
-      <h3>一覧</h3>
-      <ul>
-        {contacts.map((item) => (
-          <li key={item.id}>{item.name}</li>
-        ))}
-      </ul>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        <input
+          type="text"
+          placeholder="名前を入力してください"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          disabled={loading}
+          style={{ padding: '10px', fontSize: '16px', borderRadius: '5px', border: '1px solid #cbd5e0' }}
+        />
+        <button
+          onClick={handleInsert}
+          disabled={loading}
+          style={{ 
+            padding: '12px', 
+            fontSize: '16px', 
+            backgroundColor: '#3182ce', 
+            color: 'white', 
+            border: 'none', 
+            borderRadius: '5px', 
+            cursor: loading ? 'not-allowed' : 'pointer',
+            fontWeight: 'bold'
+          }}
+        >
+          {loading ? '処理中...' : 'DBに書き込む'}
+        </button>
+      </div>
     </div>
-  )
+  );
 }
