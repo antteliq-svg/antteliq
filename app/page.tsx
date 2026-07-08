@@ -1,89 +1,85 @@
-'use client';
+'use client'
+import { useState, useCallback } from 'react'
+import ScreenLP from '../components/ScreenLP'
+import ScreenProfile from '../components/ScreenProfile'
+import ScreenScore from '../components/ScreenScore'
+import ScreenClub from '../components/ScreenClub'
+import ScreenGoal from '../components/ScreenGoal'
+import ScreenMiss from '../components/ScreenMiss'
+import ScreenNotify from '../components/ScreenNotify'
+import ScreenAnalyzing from '../components/ScreenAnalyzing'
+import ScreenResult from '../components/ScreenResult'
+import ScreenUpsell from '../components/ScreenUpsell'
+import ScreenResultPaid from '../components/ScreenResultPaid'
 
-import { useState } from 'react';
-import { createClient } from '@supabase/supabase-js';
+export type Answers = {
+  gender?: string
+  age?: string
+  golfExp?: string
+  sports?: string[]
+  rounds?: string
+  score?: string
+  hsMeasure?: string
+  driverModel?: string
+  driverType?: string
+  driverFlex?: string
+  ironModel?: string
+  ironFlex?: string
+  favoriteClub?: string
+  favoriteReasons?: string[]
+  goal?: string
+  missFirst?: string
+  missCurve?: string
+  feel?: string
+  trajectory?: string
+  budget?: string
+  timing?: string
+  notify?: string[]
+  email?: string
+}
 
-// 1. 環境変数から安全に取得（末尾のスラッシュや前後の空白を自動で削る安全ガード付き）
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim().replace(/\/$/, '') || '';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim() || '';
+export default function Home() {
+  const [screen, setScreen] = useState(0)
+  const [answers, setAnswers] = useState<Answers>({})
 
-// 2. Supabaseクライアントの初期化
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+  const go = useCallback((n: number) => {
+    setScreen(n)
+    window.scrollTo(0, 0)
+  }, [])
 
-export default function TestPage() {
-  const [status, setStatus] = useState<string>('待機中...');
-  const [name, setName] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>(false);
+  const update = useCallback((patch: Partial<Answers>) => {
+    setAnswers(prev => ({ ...prev, ...patch }))
+  }, [])
 
-  // 📝 データの書き込み（INSERT）テスト
-  const handleInsert = async () => {
-    if (!name) {
-      alert('名前を入力してください');
-      return;
-    }
-    setLoading(true);
-    setStatus('書き込み中...');
-
-    try {
-      const { error } = await supabase
-        .from('contacts')
-        .insert([{ name: name }]);
-
-      if (error) {
-        setStatus(`[書き込み失敗] 理由: ${error.message} (コード: ${error.code})`);
-      } else {
-        setStatus('書き込み成功！🎉（DBを確認してください）');
-        setName(''); // 入力欄をクリア
-      }
-    } catch (err: any) {
-      setStatus(`[通信エラー] 理由: ${err.message || err}`);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const screens: Record<number, React.ReactNode> = {
+    0:  <ScreenLP onNext={() => go(1)} />,
+    1:  <ScreenProfile answers={answers} update={update} onNext={() => go(2)} onBack={() => go(0)} />,
+    2:  <ScreenScore answers={answers} update={update} onNext={() => go(3)} onBack={() => go(1)} />,
+    3:  <ScreenClub answers={answers} update={update} onNext={() => go(4)} onBack={() => go(2)} />,
+    4:  <ScreenGoal answers={answers} update={update} onNext={() => go(5)} onBack={() => go(3)} />,
+    5:  <ScreenMiss answers={answers} update={update} onNext={() => go(6)} onBack={() => go(4)} />,
+    6:  <ScreenNotify answers={answers} update={update} onNext={() => go(7)} onBack={() => go(5)} />,
+    7:  <ScreenAnalyzing onDone={() => go(8)} />,
+    8:  <ScreenResult answers={answers} onUpsell={() => go(9)} onBack={() => go(0)} />,
+    9:  <ScreenUpsell onPay={() => go(10)} onBack={() => go(8)} />,
+    10: <ScreenResultPaid answers={answers} onBack={() => go(0)} />,
+  }
 
   return (
-    <div style={{ padding: '40px', maxWidth: '500px', margin: '0 auto', fontFamily: 'sans-serif' }}>
-      <h2>🔌 Supabase 安全接続テスト</h2>
-      
-      <div style={{ 
-        padding: '15px', 
-        backgroundColor: status.includes('成功') ? '#e6fffa' : status.includes('失敗') || status.includes('エラー') ? '#fff5f5' : '#f7fafc',
-        border: '1px solid',
-        borderColor: status.includes('成功') ? '#319795' : status.includes('失敗') || status.includes('エラー') ? '#e53e3e' : '#cbd5e0',
-        borderRadius: '5px',
-        marginBottom: '20px',
-        fontWeight: 'bold'
-      }}>
-        現在のステータス: {status}
-      </div>
-
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-        <input
-          type="text"
-          placeholder="名前を入力してください"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          disabled={loading}
-          style={{ padding: '10px', fontSize: '16px', borderRadius: '5px', border: '1px solid #cbd5e0' }}
-        />
-        <button
-          onClick={handleInsert}
-          disabled={loading}
-          style={{ 
-            padding: '12px', 
-            fontSize: '16px', 
-            backgroundColor: '#3182ce', 
-            color: 'white', 
-            border: 'none', 
-            borderRadius: '5px', 
-            cursor: loading ? 'not-allowed' : 'pointer',
-            fontWeight: 'bold'
-          }}
-        >
-          {loading ? '処理中...' : 'DBに書き込む'}
-        </button>
+    <div style={{
+      minHeight: '100dvh',
+      display: 'flex',
+      alignItems: 'flex-start',
+      justifyContent: 'center',
+      background: '#e8ede5'
+    }}>
+      <div className="phone-frame">
+        <div className="statusbar">
+          <span>9:41</span>
+          <span style={{ display: 'flex', gap: 6, fontSize: 14 }}>▲ ◼ ▋</span>
+        </div>
+        {screens[screen]}
       </div>
     </div>
-  );
+  )
 }
