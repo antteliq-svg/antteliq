@@ -79,7 +79,7 @@ export default function ScreenScore({
                 key={o.label}
                 label={o.label}
                 sub={o.sub}
-                active={answers.hs === undefined ? false : false}
+                active={false}
                 onClick={() => {}}
               />
             ))}
