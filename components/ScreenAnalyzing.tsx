@@ -56,8 +56,6 @@ export default function ScreenAnalyzing({
       display: 'flex',
       flexDirection: 'column',
       flex: 1,
-      minHeight: '100dvh',
-      width: '100%',
       background: '#1a1a1a',
       color: 'white',
       position: 'relative',

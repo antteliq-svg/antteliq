@@ -9,23 +9,30 @@ export default function ScreenMiss({
 }) {
   const valid = !!answers.missFirst && !!answers.feel && !!answers.trajectory
 
-  const missLabel = (dir: string) => {
-    if (dir === '右へ出る') return 'フェースが開いている可能性。スライス系のミスです。'
-    if (dir === '左へ出る') return 'フェースが閉じている可能性。引っかけ・フック系のミスです。'
-    if (dir === '両方バラバラ') return 'インパクトが安定していない可能性。シャフトの硬さが影響することも。'
-    return ''
+  const getMissAnalysis = () => {
+    const first = answers.missFirst
+    const curve = answers.missCurve
+    if (first === '右へ出る' && curve === 'さらに右へ曲がる') return { type: 'スライス', cause: 'アウトサイドイン軌道＋フェースオープン。つかまりの良いヘッドと先調子シャフトが有効です。' }
+    if (first === '右へ出る' && curve === 'そのまま真っすぐ') return { type: 'プッシュ', cause: 'インサイドアウト軌道でフェースがスクエア。シャフトが硬すぎる可能性があります。' }
+    if (first === '右へ出る' && curve === '左へ戻ってくる') return { type: 'プッシュフック', cause: 'インサイドアウト軌道＋フェースクローズ。重心距離が短いヘッドが合う可能性があります。' }
+    if (first === '左へ出る' && curve === 'さらに左へ曲がる') return { type: 'フック・引っかけ', cause: 'インサイドアウト軌道＋フェースクローズ。オープンフェース設計のヘッドが有効です。' }
+    if (first === '左へ出る' && curve === 'そのまま真っすぐ') return { type: 'プル', cause: 'アウトサイドイン軌道でフェースがスクエア。スイング軌道の修正とシャフト見直しが効果的です。' }
+    if (first === '左へ出る' && curve === '右へ戻ってくる') return { type: 'プルスライス', cause: 'アウトサイドイン軌道＋フェースオープン。典型的なスライサーのパターンです。' }
+    if (first === '両方バラバラ') return { type: 'インパクト不安定', cause: 'シャフトの硬さ・重さがスイングと合っていない可能性が高いです。' }
+    return null
   }
+
+  const analysis = getMissAnalysis()
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
       <Topbar step={5} total={6} label="ミスの傾向と好み" onBack={onBack} progress={75} />
       <div className="screen-body">
-        <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 6, marginTop: 4 }}>
-          ミスしたとき、ボールはどちらへ出ますか？
+        <h2 style={{ fontSize: 20, fontWeight: 600, marginBottom: 6, marginTop: 4, letterSpacing: '-0.01em' }}>
+          ミスしたとき球はどちらへ？
         </h2>
-        <p style={{ fontSize: 13, color: '#888', marginBottom: 14, lineHeight: 1.6 }}>
-          打った直後の「出球の方向」を選んでください。<br />
-          曲がり方は次の質問で聞きます。
+        <p style={{ fontSize: 13, color: '#999', marginBottom: 20, lineHeight: 1.7 }}>
+          打った直後の出球方向を選んでください。
         </p>
 
         <div className="miss-grid">
@@ -37,7 +44,7 @@ export default function ScreenMiss({
             <button
               key={o.label}
               className={`miss-btn${answers.missFirst === o.label ? ' active' : ''}`}
-              onClick={() => update({ missFirst: o.label })}
+              onClick={() => update({ missFirst: o.label, missCurve: undefined })}
             >
               <span className="arrow">{o.arrow}</span>
               {o.label}
@@ -45,23 +52,17 @@ export default function ScreenMiss({
           ))}
         </div>
 
-        {answers.missFirst && (
-          <div style={{ background: '#F5EFE6', border: '1px solid #D4C9B8', borderRadius: 10, padding: '10px 13px', marginBottom: 18, fontSize: 13, color: '#8B6914', lineHeight: 1.6 }}>
-            💡 {missLabel(answers.missFirst)}
-          </div>
-        )}
-
         {answers.missFirst && answers.missFirst !== '両方バラバラ' && (
           <>
-            <div className="field-label">
+            <div className="field-label" style={{ marginTop: 4 }}>
               そこからどう動きますか？
-              <HelpPopup text="出球方向からさらに曲がるかどうかで、スイングの原因が違います。" />
+              <HelpPopup text="出球後の曲がり方でスイングの原因が特定できます。" />
             </div>
             <SingleChips
               options={[
-                { label: 'そのままの方向に飛ぶ', sub: 'プッシュ or プル' },
-                { label: 'さらに同じ方向に曲がる', sub: 'スライス or フック' },
-                { label: '反対方向に戻ってくる', sub: 'カット打ち系' },
+                { label: 'さらに右へ曲がる', sub: answers.missFirst === '右へ出る' ? 'スライス系' : 'プルスライス' },
+                { label: 'そのまま真っすぐ', sub: answers.missFirst === '右へ出る' ? 'プッシュ系' : 'プル系' },
+                { label: '左へ戻ってくる', sub: answers.missFirst === '右へ出る' ? 'プッシュフック' : 'フック系' },
               ]}
               value={answers.missCurve}
               onChange={v => update({ missCurve: v })}
@@ -69,27 +70,49 @@ export default function ScreenMiss({
           </>
         )}
 
-        <h2 style={{ fontSize: 17, fontWeight: 600, marginBottom: 12, marginTop: 8 }}>
+        {analysis && (
+          <div style={{
+            background: '#FAFAF8',
+            border: '1px solid #D4C9B8',
+            borderRadius: 6,
+            padding: '14px 16px',
+            marginBottom: 20,
+          }}>
+            <div style={{ fontSize: 10, fontWeight: 600, color: '#B8966E', letterSpacing: '0.08em', marginBottom: 6 }}>
+              ミスタイプ判定
+            </div>
+            <div style={{ fontSize: 15, fontWeight: 600, color: '#1a1a1a', marginBottom: 6 }}>
+              {analysis.type}
+            </div>
+            <div style={{ fontSize: 13, color: '#777', lineHeight: 1.7 }}>
+              {analysis.cause}
+            </div>
+          </div>
+        )}
+
+        <div style={{ height: 1, background: '#E8E4DE', margin: '4px 0 20px' }} />
+
+        <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16, letterSpacing: '-0.01em' }}>
           クラブへの好み
         </h2>
 
-        <div className="field-label">打った感触（打感）の好み</div>
+        <div className="field-label">打感の好み</div>
         <SingleChips
           options={[
-            { label: '柔らかめが好き', sub: '鍛造アイアンのような感触' },
+            { label: '柔らかめ', sub: '鍛造・打った感触重視' },
             { label: 'どちらでもいい' },
-            { label: '硬めでもOK', sub: '飛距離や方向性を優先' },
+            { label: '硬めでもOK', sub: '飛距離・方向性を優先' },
           ]}
           value={answers.feel}
           onChange={v => update({ feel: v })}
         />
 
-        <div className="field-label">弾道の高さの好み</div>
+        <div className="field-label">弾道の高さ</div>
         <SingleChips
           options={[
-            { label: '低めの弾道', sub: '風に強い・距離感が出しやすい' },
+            { label: '低め', sub: '風に強い・距離感を出しやすい' },
             { label: 'どちらでもいい' },
-            { label: '高い弾道', sub: 'グリーンに止まりやすい' },
+            { label: '高め', sub: 'グリーンに止まりやすい' },
           ]}
           value={answers.trajectory}
           onChange={v => update({ trajectory: v })}
