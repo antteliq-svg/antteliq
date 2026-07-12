@@ -59,11 +59,20 @@ export default function ScreenMiss({
               <HelpPopup text="出球後の曲がり方でスイングの原因が特定できます。" />
             </div>
             <SingleChips
-              options={[
-                { label: 'さらに右へ曲がる', sub: answers.missFirst === '右へ出る' ? 'スライス系' : 'プルスライス' },
-                { label: 'そのまま真っすぐ', sub: answers.missFirst === '右へ出る' ? 'プッシュ系' : 'プル系' },
-                { label: '左へ戻ってくる', sub: answers.missFirst === '右へ出る' ? 'プッシュフック' : 'フック系' },
-              ]}
+              options={
+                answers.missFirst === '右へ出る'
+                  ? [
+                      { label: '左へ戻ってくる', sub: 'プッシュフック' },
+                      { label: 'そのまま真っすぐ', sub: 'プッシュ' },
+                      { label: 'さらに右へ曲がる', sub: 'スライス' },
+                      
+                    ]
+                  : [
+                      { label: 'さらに左へ曲がる', sub: 'フック・引っかけ' },
+                      { label: 'そのまま真っすぐ', sub: 'プル' },
+                      { label: '右へ戻ってくる', sub: 'プルスライス' },
+                    ]
+              }
               value={answers.missCurve}
               onChange={v => update({ missCurve: v })}
             />

@@ -34,6 +34,8 @@ body {
   flex-direction: column;
   border-left: 1px solid var(--border);
   border-right: 1px solid var(--border);
+  overflow: hidden;      /* ← 追加 */
+  position: relative;    /* ← 追加 */
 }
 
 @media (max-width: 480px) {
