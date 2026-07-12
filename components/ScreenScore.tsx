@@ -13,23 +13,23 @@ export default function ScreenScore({
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-      <Topbar step={2} total={6} label="スコアとパワーを教えてください" onBack={onBack} progress={30} />
+      <Topbar step={2} total={6} label="スコアとヘッドスピード" onBack={onBack} progress={30} />
       <div className="screen-body">
-        <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 6, marginTop: 4 }}>
+        <h2 style={{ fontSize: 20, fontWeight: 600, marginBottom: 6, marginTop: 4 }}>
           今のプレーレベル
         </h2>
-        <p style={{ fontSize: 13, color: '#888', marginBottom: 20 }}>
+        <p style={{ fontSize: 13, color: '#999', marginBottom: 24, lineHeight: 1.7 }}>
           正直に答えるほど診断が正確になります。
         </p>
 
         <div className="field-label">平均スコア（18ホール）</div>
         {[
-          { label: '70台（シングルプレーヤー）', sub: undefined },
-          { label: '80〜89', sub: undefined },
+          { label: '70台（シングルプレーヤー）' },
+          { label: '80〜89' },
           { label: '90〜99', sub: '100切り目前' },
           { label: '100〜109', sub: '100切りを目指している' },
-          { label: '110〜119', sub: undefined },
-          { label: '120以上 or わからない', sub: undefined },
+          { label: '110〜119' },
+          { label: '120以上 or わからない' },
         ].map(o => (
           <ListOption
             key={o.label}
@@ -40,15 +40,15 @@ export default function ScreenScore({
           />
         ))}
 
-        <div className="field-label" style={{ marginTop: 8 }}>
+        <div className="field-label" style={{ marginTop: 20 }}>
           ドライバーのヘッドスピード
           <button className="help-btn" onClick={() => setShowHsHelp(v => !v)}>?</button>
         </div>
         {showHsHelp && (
           <div className="help-popup">
-            ヘッドスピードはドライバーを振ったときの速さです。<br />
-            練習場でモニターに表示される「球速（m/s）」から確認できます。<br />
-            わからなくても「わからない」を選ぶと飛距離から推定します。
+            ヘッドスピードはドライバーを振ったときの速さです。
+            練習場のモニターで確認できます。
+            わからない場合は「わからない」を選ぶとスコアから推定します。
           </div>
         )}
         <SingleChips
@@ -58,7 +58,7 @@ export default function ScreenScore({
             { label: '44〜47m/s', sub: '飛ばし屋の入口' },
             { label: '48〜51m/s', sub: '上級者レベル' },
             { label: '52m/s以上', sub: 'プロ・ハードヒッター' },
-            { label: 'わからない', sub: '飛距離から推定します' },
+            { label: 'わからない', sub: 'スコアから推定します' },
           ]}
           value={answers.hsMeasure}
           onChange={v => update({ hsMeasure: v })}
@@ -66,21 +66,21 @@ export default function ScreenScore({
 
         {answers.hsMeasure && answers.hsMeasure !== 'わからない' && (
           <>
-            <div className="field-label">
-              計測方法を教えてください
-              <HelpPopup text="計測方法によって数値の誤差が変わります。AIが診断時に補正します。" />
+            <div className="field-label" style={{ marginTop: 8 }}>
+              どうやって確認しましたか？
+              <HelpPopup text="計測方法によって数値の誤差が変わります。AIが診断時に自動で補正します。" />
             </div>
             {[
-              { label: '練習場のモニターで見た', sub: 'ボール初速から計算して補正します' },
-              { label: 'HS計測器で測った', sub: '実測値として使います' },
-              { label: '飛距離から大体で入力した', sub: '少し幅を持たせて診断します' },
+              { label: '練習場のモニターで見た', sub: 'ボール初速から自動換算します' },
+              { label: 'HS計測器で測った', sub: '実測値としてそのまま使います' },
+              { label: '飛距離から大体で入力した', sub: '幅を持たせて診断します' },
             ].map(o => (
               <ListOption
                 key={o.label}
                 label={o.label}
                 sub={o.sub}
-                active={false}
-                onClick={() => {}}
+                active={answers.hsMethod === o.label}
+                onClick={() => update({ hsMethod: o.label })}
               />
             ))}
           </>
@@ -88,6 +88,11 @@ export default function ScreenScore({
       </div>
       <div className="screen-footer">
         <button className="btn-main" onClick={onNext} disabled={!valid}>次へ</button>
+        {!valid && (
+          <p style={{ textAlign: 'center', fontSize: 12, color: '#bbb', marginTop: 8 }}>
+            スコアとヘッドスピードを選んでください
+          </p>
+        )}
       </div>
     </div>
   )

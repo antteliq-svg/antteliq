@@ -99,9 +99,9 @@ export default function ScreenNotify({
         )}
 
         {notify.includes('line') && (
-          <div style={{ background: '#f0fdf4', border: '1px solid #86efac', borderRadius: 10, padding: '12px 14px', marginBottom: 14 }}>
-            <div style={{ fontSize: 13, color: '#166534', fontWeight: 600, marginBottom: 4 }}>💬 LINE友だち追加</div>
-            <div style={{ fontSize: 12, color: '#166534', lineHeight: 1.6 }}>
+          <div style={{ background: '#F5EFE6', border: '1px solid #d4c9b8', borderRadius: 10, padding: '12px 14px', marginBottom: 14 }}>
+            <div style={{ fontSize: 13, color: '#8B6914', fontWeight: 600, marginBottom: 4 }}>💬 LINE友だち追加</div>
+            <div style={{ fontSize: 12, color: '#8B6914', lineHeight: 1.6 }}>
               診断完了後に友だち追加ページが表示されます。<br />
               追加するとLINEに結果が届きます。
             </div>

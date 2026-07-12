@@ -104,9 +104,9 @@ export default function ScreenClub({
         )}
 
         {confirmed && answers.driverModel && (
-          <div style={{ background: '#e8f5ed', border: '1.5px solid #2d7a4f', borderRadius: 10, padding: '10px 14px', marginBottom: 14 }}>
-            <div style={{ fontSize: 13, color: '#1a4a2e', fontWeight: 600, marginBottom: 4 }}>✓ {answers.driverModel}</div>
-            <div style={{ fontSize: 12, color: '#2d7a4f' }}>
+          <div style={{ background: '#F5EFE6', border: '1px solid #B8966E', borderRadius: 6, padding: '10px 14px', marginBottom: 14 }}>
+            <div style={{ fontSize: 13, color: '#8b6914', fontWeight: 600, marginBottom: 4 }}>✓ {answers.driverModel}</div>
+            <div style={{ fontSize: 12, color: '#B8966E' }}>
               {answers.driverType === 'MAX' && '高慣性モーメント・つかまりやすい設計'}
               {answers.driverType === 'LS' && '低スピン・飛距離重視設計'}
               {answers.driverType === 'STD' && 'スタンダード設計'}
@@ -118,7 +118,7 @@ export default function ScreenClub({
         <button
           className="btn-ghost"
           onClick={() => { setDriverInput('わからない'); update({ driverModel: 'わからない', driverType: 'unknown' }); setConfirmed(true) }}
-          style={{ textAlign: 'left', fontSize: 13, color: '#2d7a4f', padding: '6px 0', marginBottom: 16 }}
+          style={{ textAlign: 'left', fontSize: 13, color: '#B8966E', padding: '6px 0', marginBottom: 16 }}
         >
           クラブ名がわからない → スキップする
         </button>

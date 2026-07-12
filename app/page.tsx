@@ -20,6 +20,7 @@ export type Answers = {
   rounds?: string
   score?: string
   hsMeasure?: string
+  hsMethod?: string
   driverModel?: string
   driverType?: string
   driverFlex?: string
@@ -68,16 +69,11 @@ export default function Home() {
   return (
     <div style={{
       minHeight: '100dvh',
+      background: '#F5F5F3',
       display: 'flex',
-      alignItems: 'flex-start',
       justifyContent: 'center',
-      background: '#e8ede5'
     }}>
-      <div className="phone-frame">
-        <div className="statusbar">
-          <span>9:41</span>
-          <span style={{ display: 'flex', gap: 6, fontSize: 14 }}>▲ ◼ ▋</span>
-        </div>
+      <div className="screen-wrap">
         {screens[screen]}
       </div>
     </div>

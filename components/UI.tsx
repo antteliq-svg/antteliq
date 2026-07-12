@@ -8,19 +8,16 @@ export function Topbar({
 }) {
   return (
     <div className="topbar">
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-        <button
-          onClick={onBack}
-          style={{ background: 'none', border: 'none', color: '#2d7a4f', fontSize: 14, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, padding: 0 }}
-        >
+      <div className="topbar-row">
+        <button className="back-btn" onClick={onBack}>
           ← 戻る
         </button>
-        <span style={{ fontSize: 12, color: '#aaa' }}>{step} / {total}</span>
+        <span style={{ fontSize: 11, color: '#bbb', letterSpacing: '0.04em' }}>{step} / {total}</span>
       </div>
       <div className="progress-track">
         <div className="progress-fill" style={{ width: `${progress}%` }} />
       </div>
-      <div style={{ fontSize: 12, color: '#888', marginTop: 6 }}>{label}</div>
+      <div style={{ fontSize: 11, color: '#aaa', marginTop: 8, letterSpacing: '0.02em' }}>{label}</div>
     </div>
   )
 }
@@ -31,7 +28,7 @@ export function HelpPopup({ text }: { text: string }) {
     <>
       <button className="help-btn" onClick={() => setOpen(v => !v)} aria-label="ヘルプ">?</button>
       {open && (
-        <div className="help-popup" style={{ marginTop: 4 }}>
+        <div className="help-popup" style={{ marginTop: 6 }}>
           {text}
         </div>
       )}
@@ -54,8 +51,10 @@ export function SingleChips({
           className={`chip-single${value === o.label ? ' active' : ''}`}
           onClick={() => onChange(o.label)}
         >
-          {o.label}
-          {o.sub && <span style={{ fontSize: 11, opacity: 0.7, display: 'block' }}>{o.sub}</span>}
+          <span style={{ display: 'block' }}>{o.label}</span>
+          {o.sub && (
+            <span style={{ display: 'block', fontSize: 10, opacity: 0.7, marginTop: 2 }}>{o.sub}</span>
+          )}
         </button>
       ))}
     </div>
@@ -97,10 +96,14 @@ export function ListOption({
   label: string; sub?: string; active: boolean; onClick: () => void
 }) {
   return (
-    <button className={`list-option${active ? ' active' : ''}`} onClick={onClick} style={{ marginBottom: 8 }}>
+    <button className={`list-option${active ? ' active' : ''}`} onClick={onClick}>
       <span>
-        <span style={{ display: 'block', fontSize: 15 }}>{label}</span>
-        {sub && <span style={{ display: 'block', fontSize: 12, color: active ? '#2d7a4f' : '#888', marginTop: 2 }}>{sub}</span>}
+        <span style={{ display: 'block', fontSize: 14 }}>{label}</span>
+        {sub && (
+          <span style={{ display: 'block', fontSize: 12, color: active ? '#8B6914' : '#aaa', marginTop: 2 }}>
+            {sub}
+          </span>
+        )}
       </span>
       <span className="radio-dot" />
     </button>

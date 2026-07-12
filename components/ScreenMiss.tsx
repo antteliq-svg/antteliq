@@ -46,7 +46,7 @@ export default function ScreenMiss({
         </div>
 
         {answers.missFirst && (
-          <div style={{ background: '#f4faf6', border: '1px solid #b2d9c0', borderRadius: 10, padding: '10px 13px', marginBottom: 18, fontSize: 13, color: '#1a4a2e', lineHeight: 1.6 }}>
+          <div style={{ background: '#F5EFE6', border: '1px solid #D4C9B8', borderRadius: 10, padding: '10px 13px', marginBottom: 18, fontSize: 13, color: '#8B6914', lineHeight: 1.6 }}>
             💡 {missLabel(answers.missFirst)}
           </div>
         )}
