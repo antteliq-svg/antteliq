@@ -1,5 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
+import { Answers } from '../app/page'
+import { saveAnswers, saveDiagnosis } from '../lib/saveSession'
 
 const STEPS = [
   { label: 'スイングタイプを判定', detail: 'ミス傾向・出球方向を解析中' },
@@ -8,16 +10,44 @@ const STEPS = [
   { label: 'レポートを生成', detail: 'フィッティングアドバイスを作成中' },
 ]
 
-export default function ScreenAnalyzing({ onDone }: { onDone: () => void }) {
+function getSwingType(a: Answers): string {
+  if (a.missFirst === '右へ出る') return 'スライス傾向'
+  if (a.missFirst === '左へ出る') return 'フック傾向'
+  return 'バラつき型'
+}
+
+export default function ScreenAnalyzing({
+  answers,
+  onDone,
+}: {
+  answers: Answers
+  onDone: () => void
+}) {
   const [step, setStep] = useState(0)
 
   useEffect(() => {
+    // ステップアニメーション
     const timers = STEPS.map((_, i) =>
       setTimeout(() => setStep(i + 1), (i + 1) * 900)
     )
+
+    // DB保存
+    const save = async () => {
+      const quizAnswerId = await saveAnswers(answers)
+      if (quizAnswerId) {
+        const swingType = getSwingType(answers)
+        await saveDiagnosis({
+          quizAnswerId,
+          swingType,
+          freeResult: { swingType, goal: answers.goal, missFirst: answers.missFirst },
+        })
+      }
+    }
+    save()
+
     const done = setTimeout(onDone, STEPS.length * 900 + 600)
     return () => { timers.forEach(clearTimeout); clearTimeout(done) }
-  }, [onDone])
+  }, [answers, onDone])
 
   const progress = (step / STEPS.length) * 100
 
@@ -33,7 +63,6 @@ export default function ScreenAnalyzing({ onDone }: { onDone: () => void }) {
       position: 'relative',
       overflow: 'hidden',
     }}>
-      {/* Gold top line */}
       <div style={{
         position: 'absolute', top: 0, left: 0, right: 0, height: 2,
         background: 'linear-gradient(90deg, #B8966E, #E8C97A, #B8966E)',
@@ -47,14 +76,10 @@ export default function ScreenAnalyzing({ onDone }: { onDone: () => void }) {
         justifyContent: 'center',
         padding: '40px 32px',
       }}>
-
-        {/* SVG Golf icon */}
         <div style={{ marginBottom: 40, position: 'relative' }}>
-          {/* Outer rotating ring */}
           <svg width="80" height="80" viewBox="0 0 80 80" style={{ position: 'absolute', top: -8, left: -8, animation: 'spin 3s linear infinite' }}>
             <circle cx="40" cy="40" r="36" fill="none" stroke="#B8966E" strokeWidth="0.5" strokeDasharray="4 6" />
           </svg>
-          {/* Icon frame */}
           <div style={{
             width: 64, height: 64,
             border: '1px solid #333',
@@ -63,12 +88,9 @@ export default function ScreenAnalyzing({ onDone }: { onDone: () => void }) {
             background: '#111',
           }}>
             <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-              {/* Golf flag */}
               <line x1="10" y1="4" x2="10" y2="28" stroke="#B8966E" strokeWidth="1.5" strokeLinecap="round"/>
               <path d="M10 4 L24 9 L10 14 Z" fill="#B8966E" opacity="0.9"/>
-              {/* Ground line */}
               <line x1="4" y1="28" x2="28" y2="28" stroke="#555" strokeWidth="1" strokeLinecap="round"/>
-              {/* Ball */}
               <circle cx="22" cy="26" r="2.5" fill="white" opacity="0.8"/>
             </svg>
           </div>
@@ -84,8 +106,7 @@ export default function ScreenAnalyzing({ onDone }: { onDone: () => void }) {
           あなたの回答をもとに<br />最適なクラブを選定しています
         </p>
 
-        {/* Progress bar */}
-        <div style={{ width: '100%', marginBottom: 8 }}>
+        <div style={{ width: '100%' }}>
           <div style={{ height: 1, background: '#2a2a2a', borderRadius: 1, overflow: 'hidden', marginBottom: 24 }}>
             <div style={{
               height: '100%',

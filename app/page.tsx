@@ -60,7 +60,7 @@ export default function Home() {
     4:  <ScreenGoal answers={answers} update={update} onNext={() => go(5)} onBack={() => go(3)} />,
     5:  <ScreenMiss answers={answers} update={update} onNext={() => go(6)} onBack={() => go(4)} />,
     6:  <ScreenNotify answers={answers} update={update} onNext={() => go(7)} onBack={() => go(5)} />,
-    7:  <ScreenAnalyzing onDone={() => go(8)} />,
+    7:  <ScreenAnalyzing answers={answers} onDone={() => go(8)} />,
     8:  <ScreenResult answers={answers} onUpsell={() => go(9)} onBack={() => go(0)} />,
     9:  <ScreenUpsell onPay={() => go(10)} onBack={() => go(8)} />,
     10: <ScreenResultPaid answers={answers} onBack={() => go(0)} />,
