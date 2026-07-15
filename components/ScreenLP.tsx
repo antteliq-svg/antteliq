@@ -7,7 +7,7 @@ export default function ScreenLP({ onNext }: { onNext: () => void }) {
       {/* Hero */}
       <div style={{
         background: '#1a1a1a',
-        padding: '52px 28px 40px',
+        padding: '52px 20px 40px',
         color: 'white',
         position: 'relative',
         overflow: 'hidden',
@@ -35,7 +35,7 @@ export default function ScreenLP({ onNext }: { onNext: () => void }) {
       </div>
 
       {/* Features */}
-      <div style={{ padding: '28px 24px', flex: 1 }}>
+      <div style={{ padding: '28px 20px', flex: 1 }}>
         <div style={{ fontSize: 11, fontWeight: 600, color: '#999', letterSpacing: '0.08em', marginBottom: 16 }}>
           こんな方に
         </div>
@@ -58,7 +58,7 @@ export default function ScreenLP({ onNext }: { onNext: () => void }) {
       </div>
 
       {/* CTA */}
-      <div style={{ padding: '16px 24px 40px', background: 'white', borderTop: '1px solid #e8e4de' }}>
+      <div style={{ padding: '16px 20px 40px', background: 'white', borderTop: '1px solid #e8e4de' }}>
         <button className="btn-main" onClick={onNext}>
           無料診断をはじめる
         </button>

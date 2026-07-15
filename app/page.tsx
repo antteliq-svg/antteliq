@@ -72,7 +72,7 @@ export default function Home() {
       background: '#F5F5F3',
       display: 'flex',
       justifyContent: 'center',
-      alignItems: 'flex-start', 
+      alignItems: 'flex-start',
     }}>
       <div className="screen-wrap">
         {screens[screen]}

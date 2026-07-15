@@ -24,30 +24,35 @@ export default function ScreenAnalyzing({
   onDone: () => void
 }) {
   const [step, setStep] = useState(0)
+  const [saved, setSaved] = useState(false)
 
   useEffect(() => {
-    // ステップアニメーション
     const timers = STEPS.map((_, i) =>
       setTimeout(() => setStep(i + 1), (i + 1) * 900)
     )
-
-    // DB保存
-    const save = async () => {
-      const quizAnswerId = await saveAnswers(answers)
-      if (quizAnswerId) {
-        const swingType = getSwingType(answers)
-        await saveDiagnosis({
-          quizAnswerId,
-          swingType,
-          freeResult: { swingType, goal: answers.goal, missFirst: answers.missFirst },
-        })
-      }
-    }
-    save()
-
     const done = setTimeout(onDone, STEPS.length * 900 + 600)
-    return () => { timers.forEach(clearTimeout); clearTimeout(done) }
-  }, [answers, onDone])
+
+    if (!saved) {
+      setSaved(true)
+      const save = async () => {
+        const quizAnswerId = await saveAnswers(answers)
+        if (quizAnswerId) {
+          const swingType = getSwingType(answers)
+          await saveDiagnosis({
+            quizAnswerId,
+            swingType,
+            freeResult: { swingType, goal: answers.goal, missFirst: answers.missFirst },
+          })
+        }
+      }
+      save()
+    }
+
+    return () => {
+      timers.forEach(clearTimeout)
+      clearTimeout(done)
+    }
+  }, [])
 
   const progress = (step / STEPS.length) * 100
 
