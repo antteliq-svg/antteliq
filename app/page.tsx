@@ -67,14 +67,8 @@ export default function Home() {
   }
 
   return (
-    <div style={{
-      minHeight: '100dvh',
-      background: '#F5F5F3',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'flex-start',
-    }}>
-      <div className="screen-wrap">
+    <div className="app-outer">
+      <div className="app-wrap">
         {screens[screen]}
       </div>
     </div>

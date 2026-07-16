@@ -1,6 +1,9 @@
 'use client'
 import { useState } from 'react'
 
+/* ============================================
+   Topbar
+   ============================================ */
 export function Topbar({
   step, total, label, onBack, progress
 }: {
@@ -8,64 +11,65 @@ export function Topbar({
 }) {
   return (
     <div className="topbar">
-      <div className="topbar-row">
-        <button className="back-btn" onClick={onBack}>
-          ← 戻る
-        </button>
-        <span style={{ fontSize: 11, color: '#bbb', letterSpacing: '0.04em' }}>{step} / {total}</span>
+      <div className="topbar__row">
+        <button className="btn btn--back" onClick={onBack}>← 戻る</button>
+        <span className="topbar__step">{step} / {total}</span>
       </div>
-      <div className="progress-track">
-        <div className="progress-fill" style={{ width: `${progress}%` }} />
+      <div className="progress">
+        <div className="progress__fill" style={{ width: `${progress}%` }} />
       </div>
-      <div style={{ fontSize: 11, color: '#aaa', marginTop: 8, letterSpacing: '0.02em' }}>{label}</div>
+      <div className="topbar__label">{label}</div>
     </div>
   )
 }
 
+/* ============================================
+   HelpPopup
+   ============================================ */
 export function HelpPopup({ text }: { text: string }) {
   const [open, setOpen] = useState(false)
   return (
     <>
       <button className="help-btn" onClick={() => setOpen(v => !v)} aria-label="ヘルプ">?</button>
-      {open && (
-        <div className="help-popup" style={{ marginTop: 6 }}>
-          {text}
-        </div>
-      )}
+      {open && <div className="help-popup">{text}</div>}
     </>
   )
 }
 
+/* ============================================
+   SingleChips
+   ============================================ */
 export function SingleChips({
   options, value, onChange
 }: {
-  options: { label: string; sub?: string }[];
-  value?: string;
+  options: { label: string; sub?: string }[]
+  value?: string
   onChange: (v: string) => void
 }) {
   return (
-    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
+    <div className="chip-group">
       {options.map(o => (
         <button
           key={o.label}
-          className={`chip-single${value === o.label ? ' active' : ''}`}
+          className={`chip${value === o.label ? ' is-active' : ''}`}
           onClick={() => onChange(o.label)}
         >
-          <span style={{ display: 'block' }}>{o.label}</span>
-          {o.sub && (
-            <span style={{ display: 'block', fontSize: 10, opacity: 0.7, marginTop: 2 }}>{o.sub}</span>
-          )}
+          <span>{o.label}</span>
+          {o.sub && <span className="chip__sub">{o.sub}</span>}
         </button>
       ))}
     </div>
   )
 }
 
+/* ============================================
+   MultiChips
+   ============================================ */
 export function MultiChips({
   options, values, onChange
 }: {
-  options: string[];
-  values: string[];
+  options: string[]
+  values: string[]
   onChange: (v: string[]) => void
 }) {
   const toggle = (opt: string) => {
@@ -76,11 +80,11 @@ export function MultiChips({
     }
   }
   return (
-    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
+    <div className="chip-group">
       {options.map(o => (
         <button
           key={o}
-          className={`chip-multi${values.includes(o) ? ' active' : ''}`}
+          className={`chip chip--multi${values.includes(o) ? ' is-active' : ''}`}
           onClick={() => toggle(o)}
         >
           {o}
@@ -90,22 +94,24 @@ export function MultiChips({
   )
 }
 
+/* ============================================
+   ListOption
+   ============================================ */
 export function ListOption({
   label, sub, active, onClick
 }: {
   label: string; sub?: string; active: boolean; onClick: () => void
 }) {
   return (
-    <button className={`list-option${active ? ' active' : ''}`} onClick={onClick}>
-      <span>
-        <span style={{ display: 'block', fontSize: 14 }}>{label}</span>
-        {sub && (
-          <span style={{ display: 'block', fontSize: 12, color: active ? '#8B6914' : '#aaa', marginTop: 2 }}>
-            {sub}
-          </span>
-        )}
+    <button
+      className={`option-item${active ? ' is-active' : ''}`}
+      onClick={onClick}
+    >
+      <span className="option-item__text">
+        <span className="option-item__label">{label}</span>
+        {sub && <span className="option-item__sub">{sub}</span>}
       </span>
-      <span className="radio-dot" />
+      <span className="option-item__radio" />
     </button>
   )
 }

@@ -10,13 +10,12 @@ export default function ScreenProfile({
   const valid = !!answers.gender && !!answers.age && !!answers.golfExp
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+    <div className="screen">
       <Topbar step={1} total={6} label="あなたのことを教えてください" onBack={onBack} progress={15} />
+
       <div className="screen-body">
-        <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 6, marginTop: 4 }}>
-          基本情報
-        </h2>
-        <p style={{ fontSize: 13, color: '#888', marginBottom: 20, lineHeight: 1.6 }}>
+        <h2 className="page-title">基本情報</h2>
+        <p className="page-sub">
           診断の精度を上げるために使います。<br />すべて選択式なのでサクッと答えられます。
         </p>
 
@@ -31,7 +30,7 @@ export default function ScreenProfile({
         <SingleChips
           options={[
             { label: '20代以下' }, { label: '30代' }, { label: '40代' },
-            { label: '50代' }, { label: '60代以上' }
+            { label: '50代' }, { label: '60代以上' },
           ]}
           value={answers.age}
           onChange={v => update({ age: v })}
@@ -44,15 +43,15 @@ export default function ScreenProfile({
         <SingleChips
           options={[
             { label: '1年未満' }, { label: '1〜3年' },
-            { label: '4〜10年' }, { label: '10年以上' }
+            { label: '4〜10年' }, { label: '10年以上' },
           ]}
           value={answers.golfExp}
           onChange={v => update({ golfExp: v })}
         />
 
         <div className="field-label">
-          スポーツ歴（複数選択OK）
-          <HelpPopup text="野球やテニス経験者はスイングのクセが出やすく、クラブ選びに影響します。" />
+          スポーツ歴
+          <HelpPopup text="野球やテニス経験者はスイングのクセが出やすく、クラブ選びに影響します。複数選べます。" />
         </div>
         <MultiChips
           options={['野球・ソフト', 'テニス', 'サッカー', '水泳・ランニング', 'なし', 'その他']}
@@ -64,21 +63,18 @@ export default function ScreenProfile({
         <SingleChips
           options={[
             { label: '1〜5回' }, { label: '6〜15回' },
-            { label: '16〜30回' }, { label: '31回以上' }
+            { label: '16〜30回' }, { label: '31回以上' },
           ]}
           value={answers.rounds}
           onChange={v => update({ rounds: v })}
         />
       </div>
+
       <div className="screen-footer">
-        <button className="btn-main" onClick={onNext} disabled={!valid}>
+        <button className="btn btn--primary btn--block" onClick={onNext} disabled={!valid}>
           次へ
         </button>
-        {!valid && (
-          <p style={{ textAlign: 'center', fontSize: 12, color: '#bbb', marginTop: 8 }}>
-            性別・年齢・ゴルフ歴を選んでください
-          </p>
-        )}
+        {!valid && <p className="hint-text" style={{ textAlign: 'center', marginTop: 8 }}>性別・年齢・ゴルフ歴を選んでください</p>}
       </div>
     </div>
   )

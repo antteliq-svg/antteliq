@@ -3,41 +3,28 @@ import { Answers } from '../app/page'
 
 export default function ScreenResultPaid({ answers, onBack }: { answers: Answers; onBack: () => void }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-      {/* Header */}
-      <div style={{
-        padding: '16px 20px',
-        background: '#1a1a1a',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        flexShrink: 0,
-        position: 'relative',
-      }}>
-        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: 'linear-gradient(90deg, #B8966E, #E8C97A, #B8966E)' }} />
-        <span style={{ fontSize: 14, fontWeight: 600, color: 'white' }}>詳細レポート</span>
-        <span style={{
-          fontSize: 10, background: '#B8966E', color: 'white',
-          padding: '3px 10px', borderRadius: 2, fontWeight: 600, letterSpacing: '0.04em',
-        }}>PREMIUM</span>
+    <div className="screen">
+
+      <div className="result-header result-header--dark">
+        <span className="result-header__title">詳細レポート</span>
+        <span className="result-header__badge result-header__badge--premium">PREMIUM</span>
       </div>
 
       <div className="screen-body">
-        {/* Hero */}
-        <div className="result-hero">
-          <div style={{ fontSize: 10, color: '#B8966E', fontWeight: 600, marginBottom: 8, letterSpacing: '0.1em' }}>
-            FITTING SUMMARY
-          </div>
-          <div style={{ fontSize: 22, fontWeight: 600, marginBottom: 12, letterSpacing: '-0.01em', lineHeight: 1.3 }}>
+
+        <div className="card card--dark">
+          <div className="card__eyebrow">FITTING SUMMARY</div>
+          <div className="card__title">
             シャフト交換が<br />最優先の改善策
           </div>
-          <div style={{ fontSize: 13, color: '#aaa', lineHeight: 1.8 }}>
+          <div className="card__body">
             現行のフレックスはヘッドスピードに対して硬すぎる可能性があります。
             SRまたはRへの変更でスライスが大幅に改善する見込みです。
           </div>
         </div>
 
-        {/* Detail cards */}
+        <div className="field-label">詳細推奨</div>
+
         {[
           {
             cat: 'SHAFT',
@@ -58,36 +45,33 @@ export default function ScreenResultPaid({ answers, onBack }: { answers: Answers
             link: '詳細を見る',
           },
         ].map(c => (
-          <div key={c.cat} className="rec-card">
-            <div style={{ fontSize: 10, color: '#B8966E', fontWeight: 600, letterSpacing: '0.08em', marginBottom: 6 }}>{c.cat}</div>
-            <div style={{ fontSize: 15, fontWeight: 600, color: '#1a1a1a', marginBottom: 6 }}>{c.name}</div>
-            <div style={{ fontSize: 13, color: '#777', lineHeight: 1.7, marginBottom: 12 }}>{c.reason}</div>
-            <div style={{ fontSize: 13, color: '#8B6914', cursor: 'pointer' }}>{c.link} →</div>
+          <div key={c.cat} className="card">
+            <div className="card__eyebrow">{c.cat}</div>
+            <div className="card__title" style={{ fontSize: 15 }}>{c.name}</div>
+            <div className="card__body" style={{ color: 'var(--color-text-mid)' }}>{c.reason}</div>
+            <a className="card__link">{c.link} →</a>
           </div>
         ))}
 
-        {/* Send */}
-        <div style={{ background: '#FAFAF8', border: '1px solid #E8E4DE', borderRadius: 8, padding: '16px', marginBottom: 14 }}>
-          <div style={{ fontSize: 12, fontWeight: 600, color: '#555', letterSpacing: '0.04em', marginBottom: 12 }}>
-            結果を送る
-          </div>
-          <div style={{ display: 'flex', gap: 8 }}>
-            {['📧 メール送信', '💬 LINEで送る'].map(b => (
-              <button key={b} style={{
-                flex: 1, padding: '11px 6px',
-                border: '1px solid #B8966E', borderRadius: 6,
-                background: 'white', fontSize: 13, color: '#8B6914',
-                cursor: 'pointer', fontWeight: 500,
-              }}>
-                {b}
-              </button>
-            ))}
-          </div>
+        <div className="section-divider" />
+
+        <div className="field-label">結果を送る</div>
+        <div className="notify-group">
+          {[
+            { icon: '📧', label: 'メール送信' },
+            { icon: '💬', label: 'LINEで送る' },
+          ].map(b => (
+            <button key={b.label} className="notify-btn">
+              <span className="notify-btn__icon">{b.icon}</span>
+              {b.label}
+            </button>
+          ))}
         </div>
 
-        <button onClick={onBack} className="btn-sub">
+        <button className="btn btn--outline btn--block" onClick={onBack}>
           トップへ戻る
         </button>
+
       </div>
     </div>
   )

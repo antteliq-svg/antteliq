@@ -12,35 +12,34 @@ export default function ScreenScore({
   const valid = !!answers.score && !!answers.hsMeasure
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+    <div className="screen">
       <Topbar step={2} total={6} label="スコアとヘッドスピード" onBack={onBack} progress={30} />
+
       <div className="screen-body">
-        <h2 style={{ fontSize: 20, fontWeight: 600, marginBottom: 6, marginTop: 4 }}>
-          今のプレーレベル
-        </h2>
-        <p style={{ fontSize: 13, color: '#999', marginBottom: 24, lineHeight: 1.7 }}>
-          正直に答えるほど診断が正確になります。
-        </p>
+        <h2 className="page-title">今のプレーレベル</h2>
+        <p className="page-sub">正直に答えるほど診断が正確になります。</p>
 
         <div className="field-label">平均スコア（18ホール）</div>
-        {[
-          { label: '70台（シングルプレーヤー）' },
-          { label: '80〜89' },
-          { label: '90〜99', sub: '100切り目前' },
-          { label: '100〜109', sub: '100切りを目指している' },
-          { label: '110〜119' },
-          { label: '120以上 or わからない' },
-        ].map(o => (
-          <ListOption
-            key={o.label}
-            label={o.label}
-            sub={o.sub}
-            active={answers.score === o.label}
-            onClick={() => update({ score: o.label })}
-          />
-        ))}
+        <div className="option-list">
+          {[
+            { label: '70台（シングルプレーヤー）' },
+            { label: '80〜89' },
+            { label: '90〜99', sub: '100切り目前' },
+            { label: '100〜109', sub: '100切りを目指している' },
+            { label: '110〜119' },
+            { label: '120以上 or わからない' },
+          ].map(o => (
+            <ListOption
+              key={o.label}
+              label={o.label}
+              sub={o.sub}
+              active={answers.score === o.label}
+              onClick={() => update({ score: o.label })}
+            />
+          ))}
+        </div>
 
-        <div className="field-label" style={{ marginTop: 20 }}>
+        <div className="field-label">
           ドライバーのヘッドスピード
           <button className="help-btn" onClick={() => setShowHsHelp(v => !v)}>?</button>
         </div>
@@ -66,30 +65,35 @@ export default function ScreenScore({
 
         {answers.hsMeasure && answers.hsMeasure !== 'わからない' && (
           <>
-            <div className="field-label" style={{ marginTop: 8 }}>
+            <div className="field-label">
               どうやって確認しましたか？
               <HelpPopup text="計測方法によって数値の誤差が変わります。AIが診断時に自動で補正します。" />
             </div>
-            {[
-              { label: '練習場のモニターで見た', sub: 'ボール初速から自動換算します' },
-              { label: 'HS計測器で測った', sub: '実測値としてそのまま使います' },
-              { label: '飛距離から大体で入力した', sub: '幅を持たせて診断します' },
-            ].map(o => (
-              <ListOption
-                key={o.label}
-                label={o.label}
-                sub={o.sub}
-                active={answers.hsMethod === o.label}
-                onClick={() => update({ hsMethod: o.label })}
-              />
-            ))}
+            <div className="option-list">
+              {[
+                { label: '練習場のモニターで見た', sub: 'ボール初速から自動換算します' },
+                { label: 'HS計測器で測った', sub: '実測値としてそのまま使います' },
+                { label: '飛距離から大体で入力した', sub: '幅を持たせて診断します' },
+              ].map(o => (
+                <ListOption
+                  key={o.label}
+                  label={o.label}
+                  sub={o.sub}
+                  active={answers.hsMethod === o.label}
+                  onClick={() => update({ hsMethod: o.label })}
+                />
+              ))}
+            </div>
           </>
         )}
       </div>
+
       <div className="screen-footer">
-        <button className="btn-main" onClick={onNext} disabled={!valid}>次へ</button>
+        <button className="btn btn--primary btn--block" onClick={onNext} disabled={!valid}>
+          次へ
+        </button>
         {!valid && (
-          <p style={{ textAlign: 'center', fontSize: 12, color: '#bbb', marginTop: 8 }}>
+          <p className="hint-text" style={{ textAlign: 'center', marginTop: 8 }}>
             スコアとヘッドスピードを選んでください
           </p>
         )}

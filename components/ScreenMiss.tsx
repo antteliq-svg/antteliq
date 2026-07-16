@@ -1,6 +1,19 @@
 'use client'
 import { Answers } from '../app/page'
-import { Topbar, SingleChips, HelpPopup } from './UI'
+import { Topbar, HelpPopup } from './UI'
+
+type Analysis = { type: string; cause: string } | null
+
+function getMissAnalysis(missFirst?: string, missCurve?: string): Analysis {
+  if (missFirst === '右へ出る' && missCurve === 'さらに右へ曲がる') return { type: 'スライス', cause: 'アウトサイドイン軌道＋フェースオープン。つかまりの良いヘッドと先調子シャフトが有効です。' }
+  if (missFirst === '右へ出る' && missCurve === 'そのまま真っすぐ')  return { type: 'プッシュ', cause: 'インサイドアウト軌道でフェースがスクエア。シャフトが硬すぎる可能性があります。' }
+  if (missFirst === '右へ出る' && missCurve === '左へ戻ってくる')    return { type: 'プッシュフック', cause: 'インサイドアウト軌道＋フェースクローズ。重心距離が短いヘッドが合う可能性があります。' }
+  if (missFirst === '左へ出る' && missCurve === 'さらに左へ曲がる')  return { type: 'フック・引っかけ', cause: 'インサイドアウト軌道＋フェースクローズ。オープンフェース設計のヘッドが有効です。' }
+  if (missFirst === '左へ出る' && missCurve === 'そのまま真っすぐ')  return { type: 'プル', cause: 'アウトサイドイン軌道でフェースがスクエア。スイング軌道の修正とシャフト見直しが効果的です。' }
+  if (missFirst === '左へ出る' && missCurve === '右へ戻ってくる')    return { type: 'プルスライス', cause: 'アウトサイドイン軌道＋フェースオープン。典型的なスライサーのパターンです。' }
+  if (missFirst === '両方バラバラ') return { type: 'インパクト不安定', cause: 'シャフトの硬さ・重さがスイングと合っていない可能性が高いです。' }
+  return null
+}
 
 export default function ScreenMiss({
   answers, update, onNext, onBack
@@ -8,32 +21,15 @@ export default function ScreenMiss({
   answers: Answers; update: (p: Partial<Answers>) => void; onNext: () => void; onBack: () => void
 }) {
   const valid = !!answers.missFirst && !!answers.feel && !!answers.trajectory
-
-  const getMissAnalysis = () => {
-    const first = answers.missFirst
-    const curve = answers.missCurve
-    if (first === '右へ出る' && curve === 'さらに右へ曲がる') return { type: 'スライス', cause: 'アウトサイドイン軌道＋フェースオープン。つかまりの良いヘッドと先調子シャフトが有効です。' }
-    if (first === '右へ出る' && curve === 'そのまま真っすぐ') return { type: 'プッシュ', cause: 'インサイドアウト軌道でフェースがスクエア。シャフトが硬すぎる可能性があります。' }
-    if (first === '右へ出る' && curve === '左へ戻ってくる') return { type: 'プッシュフック', cause: 'インサイドアウト軌道＋フェースクローズ。重心距離が短いヘッドが合う可能性があります。' }
-    if (first === '左へ出る' && curve === 'さらに左へ曲がる') return { type: 'フック・引っかけ', cause: 'インサイドアウト軌道＋フェースクローズ。オープンフェース設計のヘッドが有効です。' }
-    if (first === '左へ出る' && curve === 'そのまま真っすぐ') return { type: 'プル', cause: 'アウトサイドイン軌道でフェースがスクエア。スイング軌道の修正とシャフト見直しが効果的です。' }
-    if (first === '左へ出る' && curve === '右へ戻ってくる') return { type: 'プルスライス', cause: 'アウトサイドイン軌道＋フェースオープン。典型的なスライサーのパターンです。' }
-    if (first === '両方バラバラ') return { type: 'インパクト不安定', cause: 'シャフトの硬さ・重さがスイングと合っていない可能性が高いです。' }
-    return null
-  }
-
-  const analysis = getMissAnalysis()
+  const analysis = getMissAnalysis(answers.missFirst, answers.missCurve)
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+    <div className="screen">
       <Topbar step={5} total={6} label="ミスの傾向と好み" onBack={onBack} progress={75} />
+
       <div className="screen-body">
-        <h2 style={{ fontSize: 20, fontWeight: 600, marginBottom: 6, marginTop: 4, letterSpacing: '-0.01em' }}>
-          ミスしたとき球はどちらへ？
-        </h2>
-        <p style={{ fontSize: 13, color: '#999', marginBottom: 20, lineHeight: 1.7 }}>
-          打った直後の出球方向を選んでください。
-        </p>
+        <h2 className="page-title">ミスしたとき球はどちらへ？</h2>
+        <p className="page-sub">打った直後の出球方向を選んでください。</p>
 
         <div className="miss-grid">
           {[
@@ -43,10 +39,10 @@ export default function ScreenMiss({
           ].map(o => (
             <button
               key={o.label}
-              className={`miss-btn${answers.missFirst === o.label ? ' active' : ''}`}
+              className={`miss-btn${answers.missFirst === o.label ? ' is-active' : ''}`}
               onClick={() => update({ missFirst: o.label, missCurve: undefined })}
             >
-              <span className="arrow">{o.arrow}</span>
+              <span className="miss-btn__arrow">{o.arrow}</span>
               {o.label}
             </button>
           ))}
@@ -54,81 +50,127 @@ export default function ScreenMiss({
 
         {answers.missFirst && answers.missFirst !== '両方バラバラ' && (
           <>
-            <div className="field-label" style={{ marginTop: 4 }}>
+            <div className="field-label">
               そこからどう動きますか？
               <HelpPopup text="出球後の曲がり方でスイングの原因が特定できます。" />
             </div>
-            <SingleChips
-              options={
-                answers.missFirst === '右へ出る'
-                  ? [
-                      { label: '左へ戻ってくる', sub: 'プッシュフック' },
-                      { label: 'そのまま真っすぐ', sub: 'プッシュ' },
-                      { label: 'さらに右へ曲がる', sub: 'スライス' },
-                      
-                    ]
-                  : [
-                      { label: 'さらに左へ曲がる', sub: 'フック・引っかけ' },
-                      { label: 'そのまま真っすぐ', sub: 'プル' },
-                      { label: '右へ戻ってくる', sub: 'プルスライス' },
-                    ]
-              }
-              value={answers.missCurve}
-              onChange={v => update({ missCurve: v })}
-            />
+
+            {answers.missFirst === '右へ出る' ? (
+              <div className="curve-grid">
+                <button
+                  className={`curve-btn${answers.missCurve === '左へ戻ってくる' ? ' is-active' : ''}`}
+                  onClick={() => update({ missCurve: '左へ戻ってくる' })}
+                >
+                  <span className="curve-btn__arrow">↩</span>
+                  左へ戻る
+                  <span style={{ display: 'block', fontSize: 10, marginTop: 3, opacity: 0.7 }}>プッシュフック</span>
+                </button>
+                <button
+                  className={`curve-btn${answers.missCurve === 'そのまま真っすぐ' ? ' is-active' : ''}`}
+                  onClick={() => update({ missCurve: 'そのまま真っすぐ' })}
+                >
+                  <span className="curve-btn__arrow">↑</span>
+                  そのまま
+                  <span style={{ display: 'block', fontSize: 10, marginTop: 3, opacity: 0.7 }}>プッシュ</span>
+                </button>
+                <button
+                  className={`curve-btn${answers.missCurve === 'さらに右へ曲がる' ? ' is-active' : ''}`}
+                  onClick={() => update({ missCurve: 'さらに右へ曲がる' })}
+                >
+                  <span className="curve-btn__arrow">↪</span>
+                  さらに右
+                  <span style={{ display: 'block', fontSize: 10, marginTop: 3, opacity: 0.7 }}>スライス</span>
+                </button>
+              </div>
+            ) : (
+              <div className="curve-grid">
+                <button
+                  className={`curve-btn${answers.missCurve === 'さらに左へ曲がる' ? ' is-active' : ''}`}
+                  onClick={() => update({ missCurve: 'さらに左へ曲がる' })}
+                >
+                  <span className="curve-btn__arrow">↩</span>
+                  さらに左
+                  <span style={{ display: 'block', fontSize: 10, marginTop: 3, opacity: 0.7 }}>フック</span>
+                </button>
+                <button
+                  className={`curve-btn${answers.missCurve === 'そのまま真っすぐ' ? ' is-active' : ''}`}
+                  onClick={() => update({ missCurve: 'そのまま真っすぐ' })}
+                >
+                  <span className="curve-btn__arrow">↑</span>
+                  そのまま
+                  <span style={{ display: 'block', fontSize: 10, marginTop: 3, opacity: 0.7 }}>プル</span>
+                </button>
+                <button
+                  className={`curve-btn${answers.missCurve === '右へ戻ってくる' ? ' is-active' : ''}`}
+                  onClick={() => update({ missCurve: '右へ戻ってくる' })}
+                >
+                  <span className="curve-btn__arrow">↪</span>
+                  右へ戻る
+                  <span style={{ display: 'block', fontSize: 10, marginTop: 3, opacity: 0.7 }}>プルスライス</span>
+                </button>
+              </div>
+            )}
           </>
         )}
 
         {analysis && (
-          <div style={{
-            background: '#FAFAF8',
-            border: '1px solid #D4C9B8',
-            borderRadius: 6,
-            padding: '14px 16px',
-            marginBottom: 20,
-          }}>
-            <div style={{ fontSize: 10, fontWeight: 600, color: '#B8966E', letterSpacing: '0.08em', marginBottom: 6 }}>
-              ミスタイプ判定
-            </div>
-            <div style={{ fontSize: 15, fontWeight: 600, color: '#1a1a1a', marginBottom: 6 }}>
+          <div className="card card--gold" style={{ marginBottom: 20 }}>
+            <div className="card__eyebrow">ミスタイプ判定</div>
+            <div className="card__title" style={{ fontSize: 16, color: 'var(--color-text)' }}>
               {analysis.type}
             </div>
-            <div style={{ fontSize: 13, color: '#777', lineHeight: 1.7 }}>
+            <div className="card__body" style={{ color: 'var(--color-text-mid)' }}>
               {analysis.cause}
             </div>
           </div>
         )}
 
-        <div style={{ height: 1, background: '#E8E4DE', margin: '4px 0 20px' }} />
+        <div className="section-divider" />
 
-        <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16, letterSpacing: '-0.01em' }}>
-          クラブへの好み
-        </h2>
+        <h2 className="page-title">クラブへの好み</h2>
 
         <div className="field-label">打感の好み</div>
-        <SingleChips
-          options={[
+        <div className="chip-group">
+          {[
             { label: '柔らかめ', sub: '鍛造・打った感触重視' },
             { label: 'どちらでもいい' },
             { label: '硬めでもOK', sub: '飛距離・方向性を優先' },
-          ]}
-          value={answers.feel}
-          onChange={v => update({ feel: v })}
-        />
+          ].map(o => (
+            <button
+              key={o.label}
+              className={`chip${answers.feel === o.label ? ' is-active' : ''}`}
+              onClick={() => update({ feel: o.label })}
+            >
+              <span>{o.label}</span>
+              {o.sub && <span className="chip__sub">{o.sub}</span>}
+            </button>
+          ))}
+        </div>
 
         <div className="field-label">弾道の高さ</div>
-        <SingleChips
-          options={[
+        <div className="chip-group">
+          {[
             { label: '低め', sub: '風に強い・距離感を出しやすい' },
             { label: 'どちらでもいい' },
             { label: '高め', sub: 'グリーンに止まりやすい' },
-          ]}
-          value={answers.trajectory}
-          onChange={v => update({ trajectory: v })}
-        />
+          ].map(o => (
+            <button
+              key={o.label}
+              className={`chip${answers.trajectory === o.label ? ' is-active' : ''}`}
+              onClick={() => update({ trajectory: o.label })}
+            >
+              <span>{o.label}</span>
+              {o.sub && <span className="chip__sub">{o.sub}</span>}
+            </button>
+          ))}
+        </div>
+
       </div>
+
       <div className="screen-footer">
-        <button className="btn-main" onClick={onNext} disabled={!valid}>次へ</button>
+        <button className="btn btn--primary btn--block" onClick={onNext} disabled={!valid}>
+          次へ
+        </button>
       </div>
     </div>
   )
